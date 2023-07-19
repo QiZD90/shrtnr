@@ -2,16 +2,18 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 )
 
 type RedisRepository struct {
 	Repository
-	client *redis.Client
+	client     *redis.Client
+	expiration time.Duration
 }
 
-func NewRedisRepository(addr, password string) *RedisRepository {
+func NewRedisRepository(addr, password string, expiration time.Duration) *RedisRepository {
 	client := redis.NewClient(&redis.Options{
 		Addr:     addr,
 		Password: password,
@@ -19,13 +21,14 @@ func NewRedisRepository(addr, password string) *RedisRepository {
 	})
 
 	return &RedisRepository{
-		client: client,
+		client:     client,
+		expiration: expiration,
 	}
 }
 
 func (r *RedisRepository) CreateLink(shortLink, url string) error {
 	ctx := context.Background()
-	err := r.client.Set(ctx, shortLink, url, 0).Err()
+	err := r.client.Set(ctx, shortLink, url, r.expiration).Err()
 	return err
 }
 

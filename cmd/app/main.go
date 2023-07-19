@@ -22,7 +22,7 @@ func main() {
 	}
 
 	// Connect to repo
-	repo := repository.NewRedisRepository(cfg.Redis.Addr, cfg.Redis.Password)
+	repo := repository.NewRedisRepository(cfg.Redis.Addr, cfg.Redis.Password, cfg.Redis.Expiration)
 
 	// Configure service
 	service := &service.ShrtnrService{

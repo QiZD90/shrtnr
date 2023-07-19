@@ -20,8 +20,9 @@ type ServerConfig struct {
 }
 
 type RedisConfig struct {
-	Addr     string `env:"REDIS_ADDR"`
-	Password string `env:"REDIS_PASSWORD"`
+	Addr       string        `env:"REDIS_ADDR"`
+	Password   string        `env:"REDIS_PASSWORD"`
+	Expiration time.Duration `env:"REDIS_EXPIRATION" envDefault:"0"`
 }
 
 func Parse() (*Config, error) {
