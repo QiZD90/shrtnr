@@ -1,27 +1,44 @@
 # shrtnr
-Link shortener in Go + redis, built as a rite of passage.
+Link shortener in Go + Redis, built as a rite of passage.
 
 # How to build and run
-* Configure your `URL_PREFIX` env for `shrtnr` container
+* Configure in `.env`
 * Run `docker compose up`
 
 # API
-### `POST /shorten` with POST parameter `url`
-Response:
+### `POST /shorten`
+Request:
 ```
-{"short_link": "${URL_PREFIX}/${shortened link}"}
+{"link": "${full link"}}
 ```
-
-### `GET /unshorten/{link}`
 
 Response:
 ```
-{"link": "${full link}"}
+200 {"short_link": "${URL_PREFIX}/${shortened link}"}
 ```
 or
 ```
-{"error": "No such link"}
+400 {"error": "${error message}"}
 ```
+or
+```
+500 {"error": "${error message}"}
+```
+
+### `GET /unshorten/{link}`
+Response:
+```
+200 {"full_link": "${full link}"}
+```
+or
+```
+404 {"error": "No such link"}
+```
+or
+```
+500 {"error": "${error message}"}
+```
+
 
 ### `GET /{link}`
 Response:
@@ -29,7 +46,10 @@ Response:
 `Redirect to the URL`
 
 or
-
 ```
-{"error": "No such link"}
+404 {"error": "No such link"}
+```
+or
+```
+500 {"error": "${error message}"}
 ```

@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/QiZD90/shrtnr/config"
-	"github.com/QiZD90/shrtnr/internal/mux"
+	v1 "github.com/QiZD90/shrtnr/internal/controller/http/v1"
 	"github.com/QiZD90/shrtnr/internal/repository"
 	"github.com/QiZD90/shrtnr/internal/service"
 )
@@ -26,12 +26,15 @@ func main() {
 	repo := repository.NewRedisRepository(cfg.Redis.Addr, cfg.Redis.Password, cfg.Redis.Expiration)
 
 	// Configure service
-	service := &service.ShrtnrService{
+	s := &service.ShrtnrService{
 		ErrorLog:   errorLog,
 		InfoLog:    infoLog,
 		URLPrefix:  cfg.Service.URLPrefix,
 		Repository: repo,
 	}
+
+	// Create mux
+	mux := v1.NewMux(s)
 
 	// Start the server
 	server := http.Server{
@@ -42,7 +45,7 @@ func main() {
 
 		ErrorLog: errorLog,
 
-		Handler: mux.Get(service),
+		Handler: mux,
 	}
 
 	infoLog.Printf("Listening at %s:%s", cfg.Server.Host, cfg.Server.Port)

@@ -20,18 +20,18 @@ func GenerateAdverbAdjectiveAnimal() string {
 	return fmt.Sprintf("%s-%s-%s", adverb, adjective, animal)
 }
 
-func (service *ShrtnrService) GenerateShortLink() string {
+func (s *ShrtnrService) GenerateShortLink() string {
 	// TODO: mutex?
 
 	shortLink := GenerateAdverbAdjectiveAnimal()
 
 	// TODO: handle error properly
-	for exists, err := service.Repository.LinkExists(shortLink); exists || err != nil; {
+	for exists, err := s.Repository.LinkExists(shortLink); exists || err != nil; {
 		if err != nil {
-			service.ErrorLog.Fatal(err)
+			s.ErrorLog.Fatal(err)
 		}
 
-		service.InfoLog.Printf("Hehe, %s already exists", shortLink)
+		s.InfoLog.Printf("Hehe, %s already exists", shortLink)
 		shortLink = GenerateAdverbAdjectiveAnimal()
 	}
 

@@ -2,6 +2,7 @@ package service
 
 import (
 	"log"
+	"net/url"
 
 	"github.com/QiZD90/shrtnr/internal/repository"
 )
@@ -13,25 +14,25 @@ type ShrtnrService struct {
 	Repository repository.Repository
 }
 
-func (service *ShrtnrService) CreateLink(link string) (string, error) {
-	shortLink := service.GenerateShortLink()
-	err := service.Repository.CreateLink(shortLink, link)
+func (s *ShrtnrService) CreateLink(link string) (string, error) {
+	shortLink := s.GenerateShortLink()
+	err := s.Repository.CreateLink(shortLink, link)
 	if err != nil {
-		service.ErrorLog.Print(err)
+		s.ErrorLog.Print(err)
 		return "", err
 	}
 
-	service.InfoLog.Printf("Shortened %s to %s", link, shortLink)
-	return service.URLPrefix + shortLink, nil
+	s.InfoLog.Printf("Shortened %s to %s", link, shortLink)
+	return url.JoinPath(s.URLPrefix, shortLink)
 }
 
-func (service *ShrtnrService) GetLink(shortLink string) (string, bool, error) {
-	link, exists, err := service.Repository.GetLink(shortLink)
+func (s *ShrtnrService) GetLink(shortLink string) (string, bool, error) {
+	link, exists, err := s.Repository.GetLink(shortLink)
 	if err != nil {
-		service.ErrorLog.Print(err)
+		s.ErrorLog.Print(err)
 		return "", false, err
 	}
 
-	service.InfoLog.Printf("Getting link %s -> %s; exists=%v", shortLink, link, exists)
+	s.InfoLog.Printf("Getting link %s -> %s; exists=%v", shortLink, link, exists)
 	return link, exists, nil
 }
