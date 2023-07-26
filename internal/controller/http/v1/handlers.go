@@ -2,7 +2,6 @@ package v1
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/url"
 
@@ -39,19 +38,12 @@ func (routes *shrtnrRoutes) RespondWithJson(w http.ResponseWriter, statusCode in
 }
 
 func (routes *shrtnrRoutes) ShortenLinkHandler(w http.ResponseWriter, r *http.Request) {
-	// Read POST body
-	postBody, err := io.ReadAll(r.Body)
-	if err != nil {
-		routes.RespondWithJson(w, http.StatusBadRequest, &JsonError{"Error while reading POST body"})
-		routes.s.ErrorLog.Print(err)
-		return
-	}
-	defer r.Body.Close()
-
-	// Parse request
+	// Parse JSON request
 	var j JsonShortenRequest
-	if err := json.Unmarshal(postBody, &j); err != nil {
-		routes.RespondWithJson(w, http.StatusBadRequest, &JsonError{"Error while parsing request"})
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&j); err != nil {
+		routes.RespondWithJson(w, http.StatusBadRequest, &JsonError{"Error while parsing request JSON"})
 		routes.s.ErrorLog.Print(err)
 		return
 	}
