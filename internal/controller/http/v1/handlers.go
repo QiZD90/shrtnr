@@ -3,7 +3,6 @@ package v1
 import (
 	"encoding/json"
 	"net/http"
-	"net/url"
 
 	"github.com/QiZD90/shrtnr/internal/service"
 	"github.com/go-chi/chi"
@@ -48,14 +47,14 @@ func (routes *shrtnrRoutes) ShortenLinkHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	// Validate URL TODO:
-	if _, err := url.ParseRequestURI(j.Link); err != nil {
+	// Validate URL
+	link, err := routes.s.ValidateAndFormatLink(j.Link)
+	if err != nil {
 		routes.RespondWithJson(w, http.StatusBadRequest, &JsonError{"Invalid URL"})
-		routes.s.ErrorLog.Print(err)
 		return
 	}
 
-	shortLink, err := routes.s.CreateLink(j.Link)
+	shortLink, err := routes.s.CreateLink(link)
 	if err != nil {
 		routes.RespondWithJson(w, http.StatusInternalServerError, &JsonError{"Error while shortening link"})
 		routes.s.ErrorLog.Print(err)
