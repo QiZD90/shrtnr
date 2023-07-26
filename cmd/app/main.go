@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -28,13 +29,13 @@ func main() {
 	service := &service.ShrtnrService{
 		ErrorLog:   errorLog,
 		InfoLog:    infoLog,
-		URLPrefix:  cfg.URLPrefix,
+		URLPrefix:  cfg.Service.URLPrefix,
 		Repository: repo,
 	}
 
 	// Start the server
 	server := http.Server{
-		Addr:         cfg.Server.Addr,
+		Addr:         fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port),
 		ReadTimeout:  cfg.Server.ReadTimeout,
 		WriteTimeout: cfg.Server.WriteTimeout,
 		IdleTimeout:  cfg.Server.IdleTimeout,
@@ -44,6 +45,7 @@ func main() {
 		Handler: mux.Get(service),
 	}
 
+	infoLog.Printf("Listening at %s:%s", cfg.Server.Host, cfg.Server.Port)
 	if err := server.ListenAndServe(); err != nil {
 		errorLog.Fatal(err)
 	}
